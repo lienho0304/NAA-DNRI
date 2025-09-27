@@ -1,0 +1,21 @@
+{
+  "next_id": 3,
+  "customers": [
+    {
+      "id": 1,
+      "name": "Nguyễn Văn A",
+      "organization": "Đại học khoa học tự nhiên Hà Nội",
+      "phone": "0123456789",
+      "address": "1 Lê Hồng Phong",
+      "note": ""
+    },
+    {
+      "id": 2,
+      "name": "Nguyễn Văn B",
+      "organization": "Đại học khoa học tự nhiên Hà Nội",
+      "phone": "0123456789",
+      "address": "2 Nguyễn Lữ",
+      "note": ""
+    }
+  ]
+}

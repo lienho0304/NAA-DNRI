@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Đóng lá dò · LabManage{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+	<div class="d-flex align-items-center">
+		<a href="{{ url_for('pages.closing_index') }}" class="btn btn-outline-secondary btn-sm me-3">
+			<i class="bi bi-arrow-left"></i> Quay lại
+		</a>
+		<h1 class="h4 mb-0">Đóng lá dò</h1>
+	</div>
+</div>
+
+<div class="row g-4">
+	<div class="col-12 col-lg-6">
+		<div class="card shadow-sm border-0 rounded-4">
+			<div class="card-body p-4">
+				<h2 class="h6">Thêm lá dò</h2>
+				<form method="post" action="#">
+					<div class="mb-3">
+						<label class="form-label">Mã lá dò</label>
+						<input type="text" name="foil_code" class="form-control" required>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Loại lá dò</label>
+						<select name="foil_type" class="form-select" required>
+							<option value="">Chọn loại lá dò</option>
+							<option value="Au">Vàng (Au)</option>
+							<option value="Co">Coban (Co)</option>
+							<option value="Cu">Đồng (Cu)</option>
+							<option value="Fe">Sắt (Fe)</option>
+							<option value="Ni">Niken (Ni)</option>
+							<option value="Zn">Kẽm (Zn)</option>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Khối lượng (mg)</label>
+						<input type="number" name="weight" class="form-control" step="0.001" required>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Độ dày (μm)</label>
+						<input type="number" name="thickness" class="form-control" step="0.1">
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Ghi chú</label>
+						<textarea name="note" class="form-control" rows="3"></textarea>
+					</div>
+					<button type="submit" class="btn btn-primary">Thêm lá dò</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-12 col-lg-6">
+		<div class="card shadow-sm border-0 rounded-4">
+			<div class="card-body p-4">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h2 class="h6 mb-0">Danh sách lá dò đã đóng</h2>
+					<div class="d-flex gap-2">
+						<button class="btn btn-outline-success btn-sm">
+							<i class="bi bi-download"></i> Xuất Excel
+						</button>
+					</div>
+				</div>
+				
+				<div class="table-responsive">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th>Mã lá dò</th>
+								<th>Loại</th>
+								<th>Khối lượng</th>
+								<th>Độ dày</th>
+								<th>Ngày đóng</th>
+								<th class="text-end">Thao tác</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="6" class="text-center text-muted py-4">
+									<i class="bi bi-inbox"></i><br>
+									Chưa có lá dò nào được đóng
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

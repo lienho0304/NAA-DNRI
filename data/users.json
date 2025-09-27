@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "username": "Admin",
+      "password_hash": "scrypt:32768:8:1$EVC0uh1NdPLnCfVn$e2d020023b681980f229042b7fb2c265b27518a5cc92707727de7d5381bf31cfa67832b23883c00718c423089bbb121bd3c75f755b0f2df8c6e9f7aec7e6ece2",
+      "role": "admin",
+      "permissions": [
+        "users",
+        "customers",
+        "receiving",
+        "closing",
+        "irradiation"
+      ],
+      "active": true
+    },
+    {
+      "username": "Nguyễn Đăng Khuê",
+      "password_hash": "scrypt:32768:8:1$hjw3plYlug79YchE$59da33bd664d4264735740177f73cb2c97c7dfba06fe84bbcd312d9535ecca95ad348cf03ee0bd702bd3690ebb910aabffb5a133c50484b1d3e7ac1a677fea6a",
+      "role": "admin",
+      "permissions": [
+        "users",
+        "customers",
+        "receiving",
+        "closing",
+        "irradiation"
+      ],
+      "active": true
+    },
+    {
+      "username": "Test 1",
+      "password_hash": "scrypt:32768:8:1$LuQtMFhqhmL2Wjog$8cd39717f4c67249c344cc02494944106b9511166cceac3f7e291347b89226a6922c556f2858270da06e30f4f544259e17f452880d9c79d2e8334f92c3a7f31b",
+      "role": "user",
+      "permissions": [
+        "receiving",
+        "closing"
+      ],
+      "active": true
+    }
+  ]
+}

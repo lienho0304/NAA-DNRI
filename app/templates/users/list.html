@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý người dùng · LabManage{% endblock %}
+{% block content %}
+<h1 class="h4 mb-4">Quản lý người dùng</h1>
+<div class="row g-4">
+	<div class="col-12 col-lg-5">
+		<div class="card shadow-sm border-0 rounded-4">
+			<div class="card-body p-4">
+				<h2 class="h6">Tạo người dùng mới</h2>
+				<form method="post" action="{{ url_for('pages.users_create') }}">
+					<div class="mb-3">
+						<label class="form-label">Tên đăng nhập</label>
+						<input type="text" name="username" class="form-control" required>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Mật khẩu</label>
+						<input type="password" name="password" class="form-control" required>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Vai trò</label>
+						<select name="role" class="form-select" id="role-select">
+							<option value="user">Người dùng</option>
+							<option value="admin">Quản trị viên</option>
+						</select>
+						<div class="form-text">Quản trị viên có toàn quyền ở mọi hạng mục.</div>
+					</div>
+					<div class="mb-3" id="perm-group">
+						<label class="form-label">Phân quyền hạng mục</label>
+						{% set vi_labels = {
+							'users': 'Quản lý người dùng',
+							'customers': 'Quản lý khách hàng',
+							'receiving': 'Nhận mẫu',
+							'closing': 'Đóng mẫu',
+							'irradiation': 'Chiếu mẫu'
+						} %}
+						<div class="row row-cols-2 g-2">
+							{% for section in default_sections %}
+							<div class="col">
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" value="{{ section }}" name="permissions" id="perm-{{ section }}">
+									<label class="form-check-label" for="perm-{{ section }}">{{ vi_labels.get(section, section) }}</label>
+								</div>
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+					<button type="submit" class="btn btn-primary">Tạo người dùng</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="col-12 col-lg-7">
+		<div class="card shadow-sm border-0 rounded-4">
+			<div class="card-body p-4">
+				<h2 class="h6 mb-3">Danh sách người dùng</h2>
+				<div class="table-responsive">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th>Tên</th>
+								<th>Vai trò</th>
+								<th>Quyền</th>
+								<th class="text-end">Thao tác</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for u in users %}
+							<tr>
+								<td>{{ u.username }}</td>
+								<td>{{ 'Quản trị viên' if u.role == 'admin' else 'Người dùng' }}</td>
+								<td class="small">
+									{% if u.role == 'admin' %}
+									Tất cả
+									{% else %}
+									{% set perms = (u.permissions or []) %}
+									{% for p in perms %}{{ vi_labels.get(p, p) }}{% if not loop.last %}, {% endif %}{% endfor %}
+									{% endif %}
+								</td>
+								<td class="text-end">
+									{% if u.username != 'Admin' %}
+									<form method="post" action="{{ url_for('pages.users_delete', username=u.username) }}">
+										<button type="submit" class="btn btn-sm btn-outline-danger">Xoá</button>
+									</form>
+									{% else %}
+									<em class="text-muted">Bảo vệ</em>
+									{% endif %}
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+const roleSelect = document.getElementById('role-select');
+const permGroup = document.getElementById('perm-group');
+function togglePerm() {
+	permGroup.style.display = roleSelect.value === 'admin' ? 'none' : '';
+}
+roleSelect.addEventListener('change', togglePerm);
+window.addEventListener('DOMContentLoaded', togglePerm);
+</script>
+{% endblock %}

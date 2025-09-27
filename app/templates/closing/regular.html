@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% block title %}Đóng mẫu thường · LabManage{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+	<div class="d-flex align-items-center">
+		<a href="{{ url_for('pages.closing_index') }}" class="btn btn-outline-secondary btn-sm me-3">
+			<i class="bi bi-arrow-left"></i> Quay lại
+		</a>
+		<h1 class="h4 mb-0">Đóng mẫu thường</h1>
+	</div>
+</div>
+
+<div class="row g-4">
+	<div class="col-12 col-lg-6">
+		<div class="card shadow-sm border-0 rounded-4">
+			<div class="card-body p-4">
+				<h2 class="h6">Thêm mẫu đóng thường</h2>
+				<form method="post" action="{{ url_for('pages.closing_regular_add') }}" id="closingForm">
+					<!-- Thông tin mẫu cơ bản -->
+					<div class="mb-4">
+						<h5 class="text-primary mb-3">
+							<i class="bi bi-info-circle"></i> Thông tin mẫu
+						</h5>
+						<div class="row g-3">
+							<div class="col-12">
+								<label class="form-label">Ngày đóng mẫu</label>
+								<input type="date" name="closing_date" class="form-control" required>
+							</div>
+							<div class="col-12">
+								<label class="form-label">Tên khách hàng gửi mẫu</label>
+								<input type="text" name="customer_name" class="form-control" required>
+							</div>
+							<div class="col-12">
+								<label class="form-label">Tên mẫu</label>
+								<input type="text" name="sample_name" class="form-control" required>
+							</div>
+							<div class="col-12">
+								<label class="form-label">Mã hóa</label>
+								<input type="text" name="encoding" class="form-control" required>
+							</div>
+						</div>
+					</div>
+
+					<!-- Quản lý box -->
+					<div class="mb-4">
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<h5 class="text-primary mb-0">
+								<i class="bi bi-box"></i> Quản lý box
+							</h5>
+							<button type="button" class="btn btn-outline-primary btn-sm" onclick="addBox()">
+								<i class="bi bi-plus-circle"></i> Thêm box
+							</button>
+						</div>
+						
+						<div id="boxesContainer">
+							<!-- Box đầu tiên sẽ được thêm tự động -->
+						</div>
+					</div>
+
+					<!-- Ghi chú -->
+					<div class="mb-4">
+						<label class="form-label">Ghi chú</label>
+						<textarea name="note" class="form-control" rows="3"></textarea>
+					</div>
+
+					<button type="submit" class="btn btn-primary">
+						<i class="bi bi-check-circle"></i> Lưu mẫu đóng
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-12 col-lg-6">
+		<div class="card shadow-sm border-0 rounded-4">
+			<div class="card-body p-4">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h2 class="h6 mb-0">Danh sách mẫu đã đóng</h2>
+					<div class="d-flex gap-2">
+						<a href="{{ url_for('pages.closing_regular_export') }}" class="btn btn-outline-success btn-sm">
+							<i class="bi bi-download"></i> Xuất Excel
+						</a>
+					</div>
+				</div>
+				
+				<div class="table-responsive">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th>Ngày đóng</th>
+								<th>Khách hàng</th>
+								<th>Tên mẫu</th>
+								<th>Mã hóa</th>
+								<th>Box</th>
+								<th>Khối lượng</th>
+								<th>Độ ẩm</th>
+								<th>Hiệu chỉnh</th>
+								<th class="text-end">Thao tác</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% if closed_samples %}
+								{% for sample in closed_samples %}
+								<tr>
+									<td>{{ sample.closing_date }}</td>
+									<td>{{ sample.customer_name }}</td>
+									<td>{{ sample.sample_name }}</td>
+									<td>{{ sample.encoding }}</td>
+									<td>{{ sample.box_symbol }}</td>
+									<td>{{ "%.3f"|format(sample.weight) }}g</td>
+									<td>{{ "%.2f"|format(sample.moisture) }}%</td>
+									<td>{{ "%.3f"|format(sample.corrected_weight) }}g</td>
+									<td class="text-end">
+										<div class="btn-group btn-group-sm">
+											<button class="btn btn-outline-primary btn-sm edit-sample-btn" data-sample-id="{{ sample.id }}">
+												<i class="bi bi-pencil"></i>
+											</button>
+											<button class="btn btn-outline-danger btn-sm delete-sample-btn" data-sample-id="{{ sample.id }}">
+												<i class="bi bi-trash"></i>
+											</button>
+										</div>
+									</td>
+								</tr>
+								{% endfor %}
+							{% else %}
+								<tr>
+									<td colspan="9" class="text-center text-muted py-4">
+										<i class="bi bi-inbox"></i><br>
+										Chưa có mẫu nào được đóng
+									</td>
+								</tr>
+							{% endif %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+let boxCounter = 0;
+
+// Auto-calculate corrected weight for a specific box
+function calculateCorrectedWeight(boxIndex) {
+	const weightInput = document.querySelector(`input[name="boxes[${boxIndex}][weight]"]`);
+	const moistureInput = document.querySelector(`input[name="boxes[${boxIndex}][moisture]"]`);
+	const correctedWeightInput = document.querySelector(`input[name="boxes[${boxIndex}][corrected_weight]"]`);
+	
+	if (weightInput && moistureInput && correctedWeightInput) {
+		const weight = parseFloat(weightInput.value) || 0;
+		const moisture = parseFloat(moistureInput.value) || 0;
+		const moistureWeight = weight * (moisture / 100);
+		const correctedWeight = weight - moistureWeight;
+		correctedWeightInput.value = correctedWeight.toFixed(3);
+	}
+}
+
+// Add a new box
+function addBox() {
+	const container = document.getElementById('boxesContainer');
+	const boxIndex = boxCounter++;
+	
+	const boxHtml = `
+		<div class="box-item border rounded-3 p-3 mb-3 bg-light" id="box-${boxIndex}">
+			<div class="d-flex justify-content-between align-items-center mb-3">
+				<h6 class="mb-0 text-secondary">
+					<i class="bi bi-box"></i> Box ${boxIndex + 1}
+				</h6>
+				<button type="button" class="btn btn-outline-danger btn-sm" onclick="removeBox(${boxIndex})">
+					<i class="bi bi-trash"></i> Xóa
+				</button>
+			</div>
+			<div class="row g-3">
+				<div class="col-md-6">
+					<label class="form-label">Ký hiệu box</label>
+					<input type="text" name="boxes[${boxIndex}][box_symbol]" class="form-control" required>
+				</div>
+				<div class="col-md-6">
+					<label class="form-label">Khối lượng cân (g)</label>
+					<input type="number" name="boxes[${boxIndex}][weight]" class="form-control" step="0.001" required 
+						   oninput="calculateCorrectedWeight(${boxIndex})">
+				</div>
+				<div class="col-md-6">
+					<label class="form-label">Độ ẩm mẫu (%)</label>
+					<input type="number" name="boxes[${boxIndex}][moisture]" class="form-control" step="0.01" value="0" 
+						   oninput="calculateCorrectedWeight(${boxIndex})">
+				</div>
+				<div class="col-md-6">
+					<label class="form-label">Khối lượng hiệu chỉnh (g)</label>
+					<input type="number" name="boxes[${boxIndex}][corrected_weight]" class="form-control" step="0.001" readonly>
+					<small class="form-text text-muted">Tự động tính</small>
+				</div>
+			</div>
+		</div>
+	`;
+	
+	container.insertAdjacentHTML('beforeend', boxHtml);
+}
+
+// Remove a box
+function removeBox(boxIndex) {
+	const boxElement = document.getElementById(`box-${boxIndex}`);
+	if (boxElement) {
+		boxElement.remove();
+	}
+}
+
+// Initialize form
+document.addEventListener('DOMContentLoaded', function() {
+	// Set today's date as default
+	const today = new Date().toISOString().split('T')[0];
+	document.querySelector('input[name="closing_date"]').value = today;
+	
+	// Add first box automatically
+	addBox();
+	
+	// Update form submission to handle multiple boxes
+	document.getElementById('closingForm').addEventListener('submit', function(e) {
+		const boxes = document.querySelectorAll('.box-item');
+		if (boxes.length === 0) {
+			e.preventDefault();
+			alert('Vui lòng thêm ít nhất một box!');
+			return false;
+		}
+	});
+	
+	// Add event listeners for edit and delete buttons
+	document.addEventListener('click', function(e) {
+		if (e.target.closest('.edit-sample-btn')) {
+			const sampleId = e.target.closest('.edit-sample-btn').getAttribute('data-sample-id');
+			editSample(sampleId);
+		}
+		
+		if (e.target.closest('.delete-sample-btn')) {
+			const sampleId = e.target.closest('.delete-sample-btn').getAttribute('data-sample-id');
+			deleteSample(sampleId);
+		}
+	});
+});
+
+function editSample(sampleId) {
+	// TODO: Implement edit functionality
+	alert('Chức năng chỉnh sửa sẽ được triển khai');
+}
+
+function deleteSample(sampleId) {
+	if (confirm('Bạn có chắc chắn muốn xóa mẫu này?')) {
+		const form = document.createElement('form');
+		form.method = 'POST';
+		form.action = `{{ url_for('pages.closing_regular_delete', closed_sample_id=0) }}`.replace('0', sampleId);
+		document.body.appendChild(form);
+		form.submit();
+	}
+}
+</script>
+{% endblock %}
