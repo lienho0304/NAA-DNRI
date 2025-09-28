@@ -41,7 +41,7 @@
 1. **Name**: Đặt tên cho service (ví dụ: naa-dnri-app)
 2. **Environment**: Python 3
 3. **Build Command**: `pip install -r requirements.txt`
-4. **Start Command**: `gunicorn wsgi:app`
+4. **Start Command**: `gunicorn --bind 0.0.0.0:$PORT wsgi_production:app`
 5. **Plan**: Chọn Free plan (hoặc paid plan nếu cần)
 
 ### Bước 5: Cấu hình Environment Variables
