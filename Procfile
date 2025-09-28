@@ -1,1 +1,2 @@
-web: gunicorn wsgi_production:app
+web: gunicorn wsgi:app
+
